@@ -216,6 +216,7 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
                 configuration.allowSelectImage = YES;
                 configuration.allowSelectGif = YES;
                 configuration.allowMixSelect = YES;
+                configuration.exportVideoType = ZLExportVideoTypeMp4;
             }
             //        ac.configuration.shouldAnialysisAsset = YES;
             //框架语言
