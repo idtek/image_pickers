@@ -82,7 +82,7 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
         
         ZLPhotoConfiguration *configuration =[ZLPhotoConfiguration defaultPhotoConfiguration];
         configuration.maxSelectCount = selectCount;//最多选择多少张图
-        configuration.allowMixSelect = NO;//不允许混合选择
+        //configuration.allowMixSelect = NO;//不允许混合选择
         configuration.allowTakePhotoInLibrary =showCamera;//是否显示摄像头
         configuration.allowSelectOriginal =NO;//不选择原图
         configuration.allowEditImage =enableCrop;
@@ -196,7 +196,7 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
             //                NSString *galleryMode =@"video";
             ZLPhotoActionSheet *ac = [[ZLPhotoActionSheet alloc] init];
             ac.configuration.maxSelectCount = selectCount;//最多选择多少张图
-            ac.configuration.allowMixSelect = NO;//不允许混合选择
+            //ac.configuration.allowMixSelect = NO;//不允许混合选择
             ac.configuration.allowTakePhotoInLibrary =showCamera;//是否显示摄像头
             ac.configuration.allowSelectOriginal =NO;//不选择原图
             ac.configuration.allowEditImage =enableCrop;
@@ -215,7 +215,6 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
 
                 configuration.allowSelectImage = YES;
                 configuration.allowSelectGif = YES;
-                configuration.allowMixSelect = YES;
                 configuration.exportVideoType = ZLExportVideoTypeMp4;
             }
             //        ac.configuration.shouldAnialysisAsset = YES;
