@@ -196,7 +196,7 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
             //                NSString *galleryMode =@"video";
             ZLPhotoActionSheet *ac = [[ZLPhotoActionSheet alloc] init];
             ac.configuration.maxSelectCount = selectCount;//最多选择多少张图
-            //ac.configuration.allowMixSelect = NO;//不允许混合选择
+            ac.configuration.allowMixSelect = NO;//不允许混合选择
             ac.configuration.allowTakePhotoInLibrary =showCamera;//是否显示摄像头
             ac.configuration.allowSelectOriginal =NO;//不选择原图
             ac.configuration.allowEditImage =enableCrop;
@@ -213,9 +213,10 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
 //                ac.configuration. allowSelectImage =NO;
 //                ac.configuration.allowSelectVideo =YES;
 
-                configuration.allowSelectImage = YES;
-                configuration.allowSelectGif = YES;
-                configuration.exportVideoType = ZLExportVideoTypeMp4;
+                ac.configuration.allowSelectVideo =YES;
+                ac.configuration.allowSelectImage = YES;
+                ac.configuration.allowSelectGif = YES;
+                ac.configuration.exportVideoType = ZLExportVideoTypeMp4;
             }
             //        ac.configuration.shouldAnialysisAsset = YES;
             //框架语言
@@ -246,32 +247,82 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
                         } else if (phAsset.mediaType == PHAssetMediaTypeVideo) {
                             [manager requestAVAssetForVideo:phAsset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
 
-                                AVURLAsset *urlAsset = (AVURLAsset *)asset;
-                                NSURL *url = urlAsset.URL;
-                                NSString *subString = [url.absoluteString substringFromIndex:7];
+                                 if ([NSStringFromClass(asset.class) isEqualToString:@"AVComposition"]){
 
-                                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                                formatter.dateFormat = @"yyyyMMddHHmmss";
-                                int  x = arc4random() % 10000;
-                                NSString *name = [NSString stringWithFormat:@"%@%d",[formatter stringFromDate:[NSDate date]],x];
-                                NSString  *jpgPath = [NSHomeDirectory()     stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/%@.jpg",name]];
-                                UIImage *img = [self getImage:subString]  ;
-                                //保存到沙盒
-                                [UIImageJPEGRepresentation(img,1.0) writeToFile:jpgPath atomically:YES];
-                                NSString *aPath3=[NSString stringWithFormat:@"%@/Documents/%@",NSHomeDirectory(),name];
-                                CGFloat duration = CMTimeGetSeconds(urlAsset.duration)*1000;
-                                //取出路径
-                                [arr addObject:@{
-                                    @"thumbPath":[NSString stringWithFormat:@"%@",aPath3],
-                                    @"path":[NSString stringWithFormat:@"%@",subString],
-                                    @"duration":[NSString stringWithFormat:@"%d",(int)duration]
-                                }];
-                                //NSLog(@"%@",arr);
-                                if (arr.count==assets.count) {
-                                    result(arr);
-                                    return ;
+                                                                    //获取当前时间戳
+                                                                    NSDate *datenow = [NSDate date];
+                                                                    NSString *timeSp = [NSString stringWithFormat:@"%ld", (long)[datenow timeIntervalSince1970]];
 
-                                }
+
+                                                                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                                                                    NSString *documentsDirectory = paths.firstObject;
+                                                                    NSString *myPathDocs = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mp4",timeSp]];
+                                                                    NSURL *slomoVideoURL = [NSURL fileURLWithPath:myPathDocs];
+                                                                    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:asset presetName:AVAssetExportPresetMediumQuality];
+                                                                    exporter.outputURL = slomoVideoURL;
+                                                                    exporter.outputFileType = AVFileTypeQuickTimeMovie;
+                                                                    exporter.shouldOptimizeForNetworkUse = YES;
+                                                                    [exporter exportAsynchronouslyWithCompletionHandler:^{
+                                                                        if (exporter.status == AVAssetExportSessionStatusCompleted){
+                                                                            NSLog(@"视频路径:%@",exporter.outputURL);
+                                                                            NSURL *url = exporter.outputURL;
+                                                                            NSString *subString = [url.absoluteString substringFromIndex:7];
+
+                                                                            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                                                                            formatter.dateFormat = @"yyyyMMddHHmmss";
+                                                                            int  x = arc4random() % 10000;
+                                                                            NSString *name = [NSString stringWithFormat:@"%@%d",[formatter stringFromDate:[NSDate date]],x];
+                                                                            NSString  *jpgPath = [NSHomeDirectory()     stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/%@.jpg",name]];
+                                                                            UIImage *img = [self getImage:subString]  ;
+                                                                            //保存到沙盒
+                                                                            [UIImageJPEGRepresentation(img,1.0) writeToFile:jpgPath atomically:YES];
+                                                                            NSString *aPath3=[NSString stringWithFormat:@"%@/Documents/%@.jpg",NSHomeDirectory(),name];
+                                                                            CGFloat duration = phAsset.duration*1000;
+                                                                            //取出路径
+                                                                            [arr addObject:@{
+                                                                                @"thumbPath":[NSString stringWithFormat:@"%@",aPath3],
+                                                                                @"path":[NSString stringWithFormat:@"%@",subString],
+                                                                                @"duration":[NSString stringWithFormat:@"%d",(int)duration]
+                                                                            }];
+                                                                            //NSLog(@"%@",arr);
+                                                                            if (arr.count==assets.count) {
+                                                                                result(arr);
+                                                                                return ;
+
+                                                                            }
+                                                                        }
+                                                                    }];
+
+
+                                                                } else {
+                                                                    AVURLAsset *urlAsset = (AVURLAsset *)asset;
+                                                                    NSURL *url = urlAsset.URL;
+                                                                    NSString *subString = [url.absoluteString substringFromIndex:7];
+
+                                                                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                                                                    formatter.dateFormat = @"yyyyMMddHHmmss";
+                                                                    int  x = arc4random() % 10000;
+                                                                    NSString *name = [NSString stringWithFormat:@"%@%d",[formatter stringFromDate:[NSDate date]],x];
+                                                                    NSString  *jpgPath = [NSHomeDirectory()     stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/%@.jpg",name]];
+                                                                    UIImage *img = [self getImage:subString]  ;
+                                                                    //保存到沙盒
+                                                                    [UIImageJPEGRepresentation(img,1.0) writeToFile:jpgPath atomically:YES];
+                                                                    NSString *aPath3=[NSString stringWithFormat:@"%@/Documents/%@.jpg",NSHomeDirectory(),name];
+                                                                    CGFloat duration = phAsset.duration*1000;
+                                                                    //取出路径
+                                                                    [arr addObject:@{
+                                                                        @"thumbPath":[NSString stringWithFormat:@"%@",aPath3],
+                                                                        @"path":[NSString stringWithFormat:@"%@",subString],
+                                                                        @"duration":[NSString stringWithFormat:@"%d",(int)duration]
+                                                                    }];
+                                                                    //NSLog(@"%@",arr);
+                                                                    if (arr.count==assets.count) {
+                                                                        result(arr);
+                                                                        return ;
+
+                                                                    }
+
+                                                                }
 
 
 
