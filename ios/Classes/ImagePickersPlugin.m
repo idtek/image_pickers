@@ -277,7 +277,7 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
                                                                             //保存到沙盒
                                                                             [UIImageJPEGRepresentation(img,1.0) writeToFile:jpgPath atomically:YES];
                                                                             NSString *aPath3=[NSString stringWithFormat:@"%@/Documents/%@.jpg",NSHomeDirectory(),name];
-                                                                            CGFloat duration = phAsset.duration*1000;
+                                                                            CGFloat duration = CMTimeGetSeconds(asset.duration)*1000;
                                                                             //取出路径
                                                                             [arr addObject:@{
                                                                                 @"thumbPath":[NSString stringWithFormat:@"%@",aPath3],
