@@ -163,7 +163,7 @@ public class SelectPicsActivity extends BaseActivity {
                                 paths.add(localMedia.getPath());
                             }
                         }
-                         if (paths.get(i).endsWith("mp4")) {
+                         if (isVideo(paths.get(i))) {
                              videoList.add(new VideoItem(paths.get(i), localMedia.getDuration()));
                          }
                     }
@@ -270,7 +270,7 @@ public class SelectPicsActivity extends BaseActivity {
                 .filter(new CompressionPredicate() {
                     @Override
                     public boolean apply(String path) {
-                        if (path.endsWith("mp4") || path.endsWith("MP4")) {
+                        if (isVideo(path)) {
                             Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
                             String thumbPath = CommonUtils.saveBitmap(that, new AppPath(that).getAppImgDirPath(false), bitmap);
                             Map<String, String> map = new HashMap<>();
@@ -285,7 +285,7 @@ public class SelectPicsActivity extends BaseActivity {
                                 }
                             }
                         }
-                        return !path.endsWith(".gif") && !path.endsWith(".GIF") && !path.endsWith("mp4") && !path.endsWith("MP4");
+                        return !isGif(path) && !isVideo(path);
                     }
                 })
                 .setRenameListener(new OnRenameListener() {
@@ -302,7 +302,7 @@ public class SelectPicsActivity extends BaseActivity {
                     @Override
                     public void onSuccess(File file) {
                         // 压缩成功后调用，返回压缩后的图片文件
-                        if (file.getAbsolutePath().endsWith("mp4")) {
+                        if (isVideo(file.getAbsolutePath())) {
                             return;
                         }
                         Map<String, String> map = new HashMap<>();
@@ -321,6 +321,18 @@ public class SelectPicsActivity extends BaseActivity {
                         compressFinish(paths, lubanCompressPaths);
                     }
                 }).launch();
+    }
+
+    private boolean isGif(String path) {
+        return lowerCaseEndWith(path).equals(".gif");
+    }
+
+    private boolean isVideo(String path) {
+        return lowerCaseEndWith(path).equals(".mp4") || lowerCaseEndWith(path).equals(".mov");
+    }
+
+    private String lowerCaseEndWith(String url) {
+        return url.substring(url.lastIndexOf('.')).toLowerCase();
     }
 
     private void compressFinish(List<String> paths, List<Map<String, String>> compressPaths) {
