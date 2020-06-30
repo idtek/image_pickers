@@ -62,7 +62,10 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
 -(void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result
 {
     resultBack =result;
-    if([@"getPickerPaths" isEqualToString:call.method]){
+     if ([@"getSandboxPath" isEqualToString:call.method]){
+            NSString *sandboxPath = [NSString stringWithFormat:@"%@/Documents/",NSHomeDirectory()];
+            result(sandboxPath);
+     } else if([@"getPickerPaths" isEqualToString:call.method]){
         NSDictionary *dic = call.arguments;
         NSInteger selectCount =[[dic objectForKey:@"selectCount"] integerValue];//最多多少个
         NSInteger compressSize =[[dic objectForKey:@"compressSize"] integerValue]*1024;//大小

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
-
+import 'dart:io'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:image_pickers/CropConfig.dart';
@@ -28,6 +28,14 @@ class ImagePickers {
   static const MethodChannel _channel =
       const MethodChannel('flutter/image_pickers');
 
+  //获取iOS沙盒路径
+  static Future<String> getSandboxPath() async{
+    if (Platform.isAndroid){
+      return null;
+    }
+    String path = await _channel.invokeMethod('getSandboxPath', {});
+    return path;
+  }
 
   /// 返回拍摄的图片或视频的信息 Return information of the selected picture or video
   ///
