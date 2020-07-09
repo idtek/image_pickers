@@ -242,6 +242,7 @@ static NSString *const CHANNEL_NAME = @"flutter/image_pickers";
                         PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
                         options.version = PHImageRequestOptionsVersionCurrent;
                         options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+                        options.networkAccessAllowed = true;
                         PHImageManager *manager = [PHImageManager defaultManager];
 
                         if (phAsset.mediaType == PHAssetMediaTypeImage) {
